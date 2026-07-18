@@ -1,5 +1,12 @@
 # Python
 __pycache__/
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+
+# SQLite datastore (built by scripts/prepare_data.py)
+data/*.db
 
 # Virtual environment
 .venv/

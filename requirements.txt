@@ -1,9 +1,8 @@
-python-dotenv==1.2.2 
-langchain==1.2.12
-langchain-core==1.2.23
-langchain-openai==1.1.12
-langchain-elasticsearch==1.0.0
-elasticsearch==8.19.3
-langchain-community==0.4.1
-langchain-experimental==0.4.1
-jupyter==1.1.1
+# Standalone project dependencies (no langchain, no elasticsearch).
+# Everything else it uses is in the Python standard library (subprocess, csv, json).
+requests>=2.31
+python-dotenv>=1.0
+psycopg[binary]>=3.1
+
+# To run the ORIGINAL Jupyter notebooks instead, use:
+#   pip install -r requirements-notebooks.txt

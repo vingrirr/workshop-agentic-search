@@ -1,0 +1,11 @@
+# Dependencies for the ORIGINAL Jupyter notebooks (LangChain + Elasticsearch).
+# The standalone project under src/ + scripts/ does NOT need these.
+python-dotenv==1.2.2
+langchain==1.2.12
+langchain-core==1.2.23
+langchain-openai==1.1.12
+langchain-elasticsearch==1.0.0
+elasticsearch==8.19.3
+langchain-community==0.4.1
+langchain-experimental==0.4.1
+jupyter==1.1.1

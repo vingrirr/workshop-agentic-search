@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agentic-search-workshop"
+version = "0.1.0"
+description = "Standalone, framework-free implementation of the Agentic Search for Context Engineering workshop"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "requests>=2.31",
+    "python-dotenv>=1.0",
+    "psycopg[binary]>=3.1",
+]
+
+[project.optional-dependencies]
+# Only needed to run the original Jupyter notebooks (LangChain + Elasticsearch).
+notebooks = [
+    "python-dotenv==1.2.2",
+    "langchain==1.2.12",
+    "langchain-core==1.2.23",
+    "langchain-openai==1.1.12",
+    "langchain-elasticsearch==1.0.0",
+    "elasticsearch==8.19.3",
+    "langchain-community==0.4.1",
+    "langchain-experimental==0.4.1",
+    "jupyter==1.1.1",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
