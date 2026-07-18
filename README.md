@@ -42,6 +42,9 @@ data/sessions.json      # source data (AI Engineer Europe 2026 schedule)
 **Runtime dependencies are just `requests`, `python-dotenv`, and `psycopg`** — everything
 else (subprocess, csv, json) is the Python standard library.
 
+> 📐 New to the code? See **[docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)** for a full code
+> map, the agent-loop diagram, an end-to-end trace, and a debugging guide.
+
 ## Set up
 
 ### 1. Create a virtual environment and install
