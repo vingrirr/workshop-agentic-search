@@ -55,18 +55,35 @@ source .venv/bin/activate
 pip install -r requirements.txt      # or: pip install -e .
 ```
 
-### 2. Set up PostgreSQL with pgvector
+### 2. Start PostgreSQL with pgvector
 
 You need a PostgreSQL database and the [`pgvector`](https://github.com/pgvector/pgvector)
-extension (only needed for semantic search — plain SQL search works without it).
+extension (pgvector is only needed for semantic search — plain SQL search works without it).
+
+**Easiest — Docker Compose** (ships pgvector, persists data in a named volume):
 
 ```bash
-# example: create a database
-createdb workshop
-# enable pgvector (needs a superuser or a role allowed to CREATE EXTENSION);
-# prepare_data.py also runs `CREATE EXTENSION IF NOT EXISTS vector` for you.
-psql -d workshop -c "CREATE EXTENSION IF NOT EXISTS vector;"
+docker compose up -d
 ```
+
+Then use this in your `.env` (next step):
+
+```
+DATABASE_URL='postgresql://workshop:workshop@localhost:5432/workshop'
+```
+
+`docker compose down` stops it (data kept); `docker compose down -v` also deletes the data.
+
+**Already have Postgres** (local, or on another machine — use its host/IP in the URL)?
+Point `DATABASE_URL` at it and enable the extension once; `prepare_data.py` also runs
+`CREATE EXTENSION IF NOT EXISTS vector` for you on first index:
+
+```bash
+psql "$DATABASE_URL" -c "CREATE EXTENSION IF NOT EXISTS vector;"
+```
+
+> For SQL-only (no semantic search) you don't need pgvector at all — use any Postgres and
+> index with `python scripts/prepare_data.py --no-embeddings`.
 
 ### 3. Environment variables and API keys
 

@@ -1,0 +1,32 @@
+# PostgreSQL 16 with the pgvector extension, for local development.
+#
+#   docker compose up -d          # start it
+#   docker compose down           # stop it (data is kept in the named volume)
+#   docker compose down -v        # stop and delete the data
+#
+# Then set this in your .env:
+#   DATABASE_URL='postgresql://workshop:workshop@localhost:5432/workshop'
+#
+# The pgvector/pgvector image ships the `vector` extension; prepare_data.py
+# runs `CREATE EXTENSION IF NOT EXISTS vector` for you on first index.
+
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: workshop-pg
+    environment:
+      POSTGRES_USER: workshop
+      POSTGRES_PASSWORD: workshop
+      POSTGRES_DB: workshop
+    ports:
+      - "5432:5432"
+    volumes:
+      - workshop-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U workshop -d workshop"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  workshop-pgdata:
