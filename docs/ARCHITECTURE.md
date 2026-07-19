@@ -51,6 +51,40 @@ flowchart TD
 `run_agent`), then `models.py` (`Document`, `Skill`). ~150 lines gives you the whole
 picture.
 
+### How the loop knows when to stop
+
+There are exactly two ways out — and the primary one is *not* an explicit "done" signal.
+
+**Exit 1 — the model stops asking for tools** (`agent.py:95-97`). Every turn, `run_agent`
+checks whether the model's response contained any tool calls:
+
+```python
+tool_calls = message.get("tool_calls")
+if not tool_calls:
+    return message.get("content") or ""   # this response *is* the final answer
+```
+
+There is no "stop" tool and no sentinel token — **stopping is the *absence* of a tool
+request.** The model may call a tool or just reply (the request uses
+`tool_choice="auto"`, so it's never forced to), and the first turn it replies without a
+tool call, the loop returns that text. Equivalently, the chat-completions `finish_reason`
+flips from `"tool_calls"` to `"stop"`; we infer the same thing from the missing
+`tool_calls` rather than reading `finish_reason` directly.
+
+**Exit 2 — the step cap** (`agent.py:88` and `agent.py:126`). If the model never settles
+and keeps requesting tools, the `for _ in range(max_steps)` loop (default 10) runs out and
+returns `"(stopped: reached max steps without a final answer)"`. This is purely a runaway
+guard — in a healthy run, Exit 1 always fires first.
+
+Two things that trip people up:
+
+- **A "step" is one model turn, not one tool call.** A single turn can request several
+  tools (`for call in tool_calls`); they all run and append results before the next model
+  call. `max_steps` counts round-trips, not tool executions.
+- **The check runs right after the model speaks, before any tool executes.** Tool errors
+  don't stop the loop — they're caught and fed *back* to the model as the tool result, so
+  it can self-correct on the next turn.
+
 ## A request, end to end
 
 Technique 02 answering *"How many sessions are on April 8th?"* — the shape of what
