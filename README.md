@@ -154,6 +154,38 @@ The project is built so you can swap the data and the store independently:
 For a store that is "mostly heuristic search", you can rely on `execute_query` (SQL) alone
 and index with `--no-embeddings` until you decide what to embed for vector search.
 
+### Example: Tour de France stage previews (inrng.com)
+
+[`scripts/scrape_tour_data.py`](./scripts/scrape_tour_data.py) is a worked example of the
+"different data" swap: it ingests **Tour de France stage previews** from
+[The Inner Ring](https://inrng.com/tour/) so you can run semantic search over them.
+
+```bash
+python scripts/scrape_tour_data.py                    # every edition it can discover
+python scripts/scrape_tour_data.py --years 2024 2025  # just these editions
+python scripts/scrape_tour_data.py --limit 3 -v       # smoke test (3 stages, verbose)
+python scripts/scrape_tour_data.py --list-only        # discover URLs only, don't fetch
+```
+
+It **discovers** stage URLs (the slug and month differ every year, so they can't be
+constructed) by crawling the site's XML sitemap and harvesting links from the `/tour/`
+guide, then extracts a clean description from each page's `.entry-content`, dropping the
+comment thread and share/related-post cruft. Output lands in `data/tour_stages.json`:
+
+```json
+{ "source": "https://inrng.com/tour/", "editions": [2020, "…"], "totalStages": 210,
+  "stages": [ { "edition": 2024, "stage": 1, "title": "Tour de France Stage 1 Preview",
+                "url": "…", "date": "2024-06-29", "description": "…", "word_count": 812 } ] }
+```
+
+Only `requests` (already a dependency) and the standard library are used. Offline tests for
+the parser/discovery live in [`tests/test_scrape_tour_data.py`](./tests/test_scrape_tour_data.py)
+(`python tests/test_scrape_tour_data.py`). To finish the swap, point `dataset.py`'s
+`load_records` at `tour_stages.json` and map `stage`/`edition`/`description` onto `Document`
+fields, then re-run `prepare_data.py`.
+
+> Please be polite to a personal blog: the script rate-limits requests (`--delay`, default 1s).
+
 ## Running the original notebooks
 
 The original LangChain + Elasticsearch notebooks are still under `notebooks/`.
